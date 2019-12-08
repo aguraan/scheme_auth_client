@@ -5,6 +5,21 @@
         class = "fill-height"
         fluid
       >
+        <v-snackbar
+          v-model="snackbar"
+          :color="snackbarColor"
+          :timeout="timeout"
+          top
+      >
+        {{ snackbarText }}
+        <v-btn
+          dark
+          text
+          @click="snackbar = false"
+        >
+          Закрыть
+        </v-btn>
+        </v-snackbar>
         <v-row
           align="center"
           justify="center"
@@ -50,9 +65,7 @@
                   value="login"
                 >
                   <v-card-text>
-<form action="/login" method="post" ref="loginSubmit">
-<input type="hidden" name="email" :value="email">
-<input type="hidden" name="password" :value="loginPassword">
+
                     <v-form
                       ref="loginForm"
                       v-model="validLogin"
@@ -85,7 +98,7 @@
                       </v-btn>
 
                     </v-form>
-</form>
+
                   </v-card-text>
                 </v-tab-item>
 
@@ -93,9 +106,7 @@
                   value="signup"
                 >
                   <v-card-text>
-<form action="/register" method="post" ref="registerSubmit">
-<input type="hidden" name="email" :value="email">
-<input type="hidden" name="password" :value="signupPassword">
+
                     <v-form
                       ref="signupForm"
                       v-model="validSignup"
@@ -198,7 +209,7 @@
                       </v-checkbox>
 
                     </v-form>
-</form>
+
                   </v-card-text>
                 </v-tab-item>
               </v-tabs>
@@ -218,7 +229,7 @@
                         small
                         tile
                         depressed
-                        href="google"
+                        @click="googleLogin"
                       >
                         <v-icon left>mdi-google</v-icon>
                         <span class="text-capitalize">{{ tabText.login }}&nbsp;</span>
@@ -240,7 +251,7 @@
                         small
                         tile
                         depressed
-                        href="facebook"
+                        @click="facebookLogin"
                       >
                         <v-icon left>mdi-facebook</v-icon>
                         <span class="text-capitalize">{{ tabText.login }}&nbsp;</span>
@@ -276,11 +287,15 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 export default {
   name: 'App',
   data: () => ({
     dialog: false,
+    snackbar: false,
+    snackbarText: '',
+    snackbarColor: 'info',
+    timeout: 6000,
     validLogin: true,
     validSignup: true,
     tab: null,
@@ -339,18 +354,84 @@ export default {
     validateLogin() {
       if (this.$refs.loginForm.validate()) {
         this.loading = true
-        this.$refs.loginSubmit.submit()
-        this.loading = false
-        // setTimeout(() => this.loading = false, 3000)
+        axios.post('/login', {
+          email: this.email,
+          password: this.loginPassword
+        })
+        .then(response => {
+          this.snackbarText = 'Успешная аутентификация'
+          this.snackbarColor = 'success'
+          this.snackbar = true
+          // eslint-disable-next-line
+          console.log({ response })
+        })
+        .catch(error => {
+          this.snackbarText = error.message ? error.message : 'Basic error text'
+          this.snackbarColor = 'error'
+          this.snackbar = true
+          // eslint-disable-next-line
+          console.log({ error })
+        })
+        setTimeout(() => this.loading = false, 3000)
       }
     },
     validateSignup() {
       if (this.$refs.signupForm.validate()) {
         this.loading = true
-        this.$refs.registerSubmit.submit()
-        this.loading = false
-        // setTimeout(() => this.loading = false, 3000)
+        axios.post('/register', {
+          email: this.email,
+          password: this.signupPassword
+        })
+        .then(response => {
+          this.snackbarText = 'Успешная аутентификация'
+          this.snackbarColor = 'success'
+          this.snackbar = true
+          // eslint-disable-next-line
+          console.log({ response })
+        })
+        .catch(error => {
+          this.snackbarText = error.message ? error.message : 'Basic error text'
+          this.snackbarColor = 'error'
+          this.snackbar = true
+          // eslint-disable-next-line
+          console.log({ error })
+        })
+        setTimeout(() => this.loading = false, 3000)
       }
+    },
+    googleLogin() {
+      axios.get('/google')
+        .then(response => {
+          this.snackbarText = 'Успешная аутентификация'
+          this.snackbarColor = 'success'
+          this.snackbar = true
+          // eslint-disable-next-line
+          console.log({ response })
+        })
+        .catch(error => {
+          this.snackbarText = error.message ? error.message : 'Basic error text'
+          this.snackbarColor = 'error'
+          this.snackbar = true
+          // eslint-disable-next-line
+          console.log({ error })
+        })
+    },
+    facebookLogin() {
+      axios.get('/facebook')
+        .then(response => {
+          this.snackbarText = 'Успешная аутентификация'
+          this.snackbarColor = 'success'
+          this.snackbar = true
+          // eslint-disable-next-line
+          console.log({ response })
+        })
+        .catch(error => {
+          this.snackbarText = error.message ? error.message : 'Basic error text'
+          this.snackbarColor = 'error'
+          this.snackbar = true
+          // eslint-disable-next-line
+          console.log({ error })
+        })
     }
   }
 }
